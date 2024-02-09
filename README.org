@@ -1,0 +1,32 @@
+* Presentación
+
+[[https://dwm.suckless.org/][dwm]] es un gestor de ventanas dinámico para X extremadamente rápido y liviano. Este código consiste en algunas modificaciones menores al original del proyecto [[https://suckless.org/][suckless]].
+
+** Versión de dwm
+
+- 6.3
+
+** Parches agregados
+
+- [[https://dwm.suckless.org/patches/push/][push]]
+- [[https://dwm.suckless.org/patches/uselessgap/][uselessgap]] 
+
+* Requisitos
+
+En Debian GNU/Linux: 
+
+=# apt install build-essential libx11-dev libxinerama-dev libxft-dev fonts-jetbrains-mono=
+
+* Instalación
+
+- =$ git clone https://codeberg.org/dlmayhem/terror-dwm.git=
+- =$ cd terror-dwm=
+- =# make clean install=
+
+* Configuración
+
+La configuración se puede hacer directamente en el archivo config.h. Luego se debe recompilar.
+
+* Licencia
+
+El código original se publica bajo la licencia MIT/X Consortium por parte del proyecto Suckless. Por virtud de esta licencia, el mismo código y las modificaciones presentes en este repositorio se publican además bajo la licencia GPLv3 o posteriores. Se incluye una copia de ambas licencias. 
