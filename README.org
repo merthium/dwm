@@ -29,4 +29,4 @@ La configuración se puede hacer directamente en el archivo config.h. Luego se d
 
 * Licencia
 
-El código original se publica bajo la licencia MIT/X Consortium por parte del proyecto Suckless. Por virtud de esta licencia, el mismo código y las modificaciones presentes en este repositorio se publican además bajo la licencia GPLv3 o posteriores. Se incluye una copia de ambas licencias. 
+El código original se publica bajo la licencia MIT/X Consortium por parte del proyecto Suckless. Por virtud de esta licencia, el mismo código y las modificaciones presentes en este repositorio se publican además bajo la licencia GPLv3 o posteriores. Se incluye una copia de ambas licencias.
