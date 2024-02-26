@@ -36,7 +36,6 @@ static const Rule rules[] = {
 	{ "Telegram",    NULL,       NULL,       1 << 5,       0,           -1 },
 	{ "Ardour",      NULL,       NULL,       1 << 6,       0,           -1 },
 	{ "Gimp",        NULL,       NULL,       1 << 6,       0,           -1 },
-	{ "Drawing",     NULL,       NULL,       1 << 6,       0,           -1 },
 };
 
 /* layout(s) */
@@ -112,7 +111,8 @@ static Key keys[] = {
 	TAGKEYS(                        XK_7,                      6)
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
-	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
+	{ MODKEY|ShiftMask,             XK_q,      spawn,          SHCMD("dmenu-logout") },
+	{ MODKEY|ShiftMask,             XK_Delete, quit,           {0} },
 };
 
 /* button definitions */
