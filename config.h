@@ -78,7 +78,6 @@ static Key keys[] = {
 	{ MODKEY,                       XK_z,      spawn,          SHCMD("zathura") },
 	{ MODKEY,                       XK_e,      spawn,          SHCMD("emacs -mm") },
 	{ MODKEY,                       XK_a,      spawn,          SHCMD("ardour") },
-	{ MODKEY|ShiftMask,             XK_Return, spawn,          SHCMD("dmenu-logout") },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_Down,   focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_Up,     focusstack,     {.i = -1 } },

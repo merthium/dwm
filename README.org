@@ -13,9 +13,15 @@
 
 * Requisitos
 
-En Debian GNU/Linux: 
+** En Devuan GNU/Linux: 
 
 =# apt install build-essential libx11-dev libxinerama-dev libxft-dev fonts-jetbrains-mono=
+
+** En Void Linux:
+
+=# xbps-install base-devel libX11-devel libXinerama-devel LibXft-devel=
+
+*NOTA*: Las fuentes JetBrainsMono no se encuentran en el repositorio de Void, por lo que deben descargarse desde [[https://www.jetbrains.com/lp/mono/][acá]] y copiarse manualmente en el directorio =/usr/share/fonts/TTF=.
 
 * Instalación
 
