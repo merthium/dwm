@@ -32,17 +32,17 @@ static const Rule rules[] = {
 	/* class         instance    title       tags mask     isfloating   monitor */
 	{ "Emacs",       NULL,       NULL,       1 << 1,       0,           -1 },
 	{ "qutebrowser", NULL,       NULL,       1 << 2,       0,           -1 },
-	{ "Firefox",     NULL,       NULL,       1 << 2,       0,           -1 },	
+	{ "zen",         NULL,       NULL,       1 << 2,       0,           -1 },	
 	{ "Telegram",    NULL,       NULL,       1 << 5,       0,           -1 },
 	{ "Ardour",      NULL,       NULL,       1 << 6,       0,           -1 },
 	{ "Gimp",        NULL,       NULL,       1 << 6,       0,           -1 },
 };
 
 /* layout(s) */
-static const float mfact     = 0.5;  /* factor of master area size [0.05..0.95] */
-static const int nmaster     = 1;    /* number of clients in master area */
-static const int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
-static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
+static const float mfact        = 0.5;  /* factor of master area size [0.05..0.95] */
+static const int nmaster        = 1;    /* number of clients in master area */
+static const int resizehints    = 0;    /* 1 means respect size hints in tiled resizals */
+static const int lockfullscreen = 1;    /* 1 will force focus on the fullscreen window */
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
@@ -73,16 +73,19 @@ static Key keys[] = {
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_h,      spawn,          {.v = fmcmd } },
+	{ MODKEY,                       XK_e,      spawn,          SHCMD("emacs -mm") },
+	{ MODKEY,                       XK_a,      spawn,          SHCMD("ardour") },
 	{ MODKEY,                       XK_w,      spawn,          SHCMD("qutebrowser") },
+	{ MODKEY,	                XK_z,      spawn,          SHCMD("zathura") },
+	{ MODKEY|ShiftMask,             XK_b,      spawn,          SHCMD("dmenu-bt") },
+	{ MODKEY|ShiftMask,             XK_f,      spawn,          SHCMD("st -e fzf") },
 	{ MODKEY|ShiftMask,             XK_w,      spawn,          SHCMD("dmenu-www") },
 	{ MODKEY|ShiftMask,             XK_y,      spawn,          SHCMD("ytfzf -D") },
-	{ MODKEY,	                XK_z,      spawn,          SHCMD("zathura") },
 	{ MODKEY|ShiftMask,             XK_z,      spawn,          SHCMD("dmenu-pdfs") },
 	{ MODKEY|ShiftMask,             XK_m,      spawn,          SHCMD("dmenu-monitors") },
 	{ MODKEY|ShiftMask,             XK_k,      spawn,          SHCMD("dmenu-keys") },
-	{ MODKEY|ShiftMask,             XK_r,      spawn,          SHCMD("dmenu-rec") },	
-	{ MODKEY,                       XK_e,      spawn,          SHCMD("emacs -mm") },
-	{ MODKEY,                       XK_a,      spawn,          SHCMD("ardour") },
+	{ MODKEY|ShiftMask,             XK_r,      spawn,          SHCMD("dmenu-rec") },
+	{ MODKEY|ShiftMask,             XK_o,      spawn,          SHCMD("dmenu-chats") },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_Down,   focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_Up,     focusstack,     {.i = -1 } },
