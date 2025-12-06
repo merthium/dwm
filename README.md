@@ -1,1 +1,2 @@
-<img width="1920" height="1080" alt="2025-12-05-19-05-57" src="https://github.com/user-attachments/assets/3b084911-a2a1-44d6-b810-3c79475a34b6" />
+![ss1](https://github.com/user-attachments/assets/d1546029-ebd3-4f75-b74a-6460d029451e)
+![ss2](https://github.com/user-attachments/assets/e5a3e17d-912a-4649-82b9-3d76e32b0bb5)
