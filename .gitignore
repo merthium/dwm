@@ -1,0 +1,8 @@
+*.o
+/dwm
+/dwm-*.tar.gz
+/tests/bar-labels
+/tests/tray-order
+/tests/grab-release
+/tests/tray-stacking
+/tests/tag-animation
