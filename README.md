@@ -39,17 +39,21 @@ tile. Closing the application restores the terminal. For example, run
 `feh image.png` or `nsxiv image.png` in urxvt. No wrapper or shell hook is needed.
 
 `swallowautomatic` enables this behavior. `terminalapps` lists lowercase
-WM_CLASS names. The application must inherit `WINDOWID`, and its local PID
-must be available through XRes so dwm can read `/proc/PID/environ`. Using the
+WM_CLASS names. The application or one of its ancestors must inherit `WINDOWID`,
+and its local PID must be available through XRes. dwm reads `/proc/PID/environ`
+and follows `PPid` in `/proc/PID/status` through up to 64 ancestors, so programs
+that clear their environment can still use the launching shell's terminal ID. Using the
 window ID rather than the terminal's PID keeps urxvtc windows distinct even
 when they share one urxvtd process. New terminal windows and transient dialogs
 are excluded; an already swallowing terminal does not swallow another window.
-Programs that reuse an existing process or discard `WINDOWID` may open
-separately. The existing `_BETTER_SWALLOW` registration interface remains
+Programs that reuse an existing process, or lose both their terminal ancestry
+and `WINDOWID`, may open separately. The existing `_BETTER_SWALLOW` registration interface remains
 available for explicit swallowing.
 
 `tests/swallow` checks real XRes PID lookup, two terminals sharing a process,
 replacement tile geometry, and terminal restoration on an isolated X server.
+The `--sanitized-test` case verifies a GUI process that drops `WINDOWID` while
+its launcher retains the terminal identity.
 
 ## Credits
 

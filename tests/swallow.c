@@ -36,16 +36,30 @@ int main(int argc, char **argv) {
   Client *terminal, *other, *application;
   int channel[2], x, y, width, height;
   pid_t child;
+  long applicationpid;
   char windowid[32];
   FILE *stream;
 
+  if (argc == 2 && strcmp(argv[1], "--launcher") == 0) {
+    child = fork();
+    if (child < 0)
+      return 2;
+    if (child == 0) {
+      unsetenv("WINDOWID");
+      execl(argv[0], argv[0], "--child", (char *)NULL);
+      _exit(2);
+    }
+    close(STDOUT_FILENO);
+    waitpid(child, NULL, 0);
+    return 0;
+  }
   if (argc == 2 && strcmp(argv[1], "--child") == 0) {
     Display *display = XOpenDisplay(NULL);
     if (!display)
       return 2;
     image = newwindow(display, "feh");
     XSync(display, False);
-    printf("%lu\n", image);
+    printf("%ld %lu\n", (long)getpid(), image);
     fflush(stdout);
     while (1)
       pause();
@@ -72,21 +86,25 @@ int main(int argc, char **argv) {
   if (child < 0)
     die("Cannot start child client:");
   if (child == 0) {
+    setpgid(0, 0);
     close(channel[0]);
     dup2(channel[1], STDOUT_FILENO);
     close(channel[1]);
     close(ConnectionNumber(dpy));
     snprintf(windowid, sizeof windowid, "%lu", first);
     setenv("WINDOWID", windowid, 1);
-    execl(argv[0], argv[0], "--child", (char *)NULL);
+    execl(argv[0], argv[0], argc == 2 ? "--launcher" : "--child", (char *)NULL);
     _exit(2);
   }
   close(channel[1]);
   stream = fdopen(channel[0], "r");
-  if (!stream || fscanf(stream, "%lu", &image) != 1)
+  if (!stream || fscanf(stream, "%ld %lu", &applicationpid, &image) != 2)
     die("Child did not create its X window.");
   fclose(stream);
-  expect(wintopid(image) == child, "XRes resolves the real application PID");
+  expect(wintopid(image) == applicationpid, "XRes resolves the real application PID");
+  if (argc == 2)
+    expect(processterminalwindow(applicationpid) == None,
+           "sanitized application fixture has no WINDOWID");
   application = managewindow(image);
   expect(application->swallower == terminal, "GUI automatically replaces its terminal");
   expect(terminal->swallowed == application, "terminal tracks its application");
@@ -103,7 +121,7 @@ int main(int argc, char **argv) {
   expect(terminal->x == x && terminal->y == y &&
          terminal->w == width && terminal->h == height,
          "restored terminal retains its tile");
-  kill(child, SIGTERM);
+  kill(-child, SIGTERM);
   waitpid(child, NULL, 0);
   XDestroyWindow(dpy, first);
   unmanage(terminal, 1);
@@ -112,6 +130,7 @@ int main(int argc, char **argv) {
   cleanup();
   XCloseDisplay(dpy);
   if (!failures)
-    puts("PASS: automatic swallow, shared terminal daemon, tile geometry, terminal restoration");
+    puts(argc == 2 ? "PASS: sanitized GUI environment, ancestor terminal, geometry and restoration" :
+                    "PASS: automatic swallow, shared terminal daemon, tile geometry, terminal restoration");
   return failures ? 1 : 0;
 }

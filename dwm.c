@@ -559,6 +559,26 @@ Window processterminalwindow(pid_t pid) {
   return window;
 }
 
+pid_t processparentpid(pid_t pid) {
+#ifdef __linux__
+  char path[64], line[256];
+  FILE *file;
+  long parent = 0;
+
+  snprintf(path, sizeof path, "/proc/%ld/status", (long)pid);
+  if (!(file = fopen(path, "r")))
+    return 0;
+  while (fgets(line, sizeof line, file)) {
+    if (sscanf(line, "PPid: %ld", &parent) == 1)
+      break;
+  }
+  fclose(file);
+  return parent > 0 && parent <= INT_MAX ? (pid_t)parent : 0;
+#else
+  return 0;
+#endif
+}
+
 int isterminal(Client *c) {
   for (size_t i = 0; i < LENGTH(terminalapps); i++)
     if (strcmp(c->appname, terminalapps[i]) == 0)
@@ -573,12 +593,25 @@ Client *autoterminal(Client *c, pid_t pid) {
   if (!swallowautomatic || isterminal(c) ||
       XGetTransientForHint(dpy, c->win, &transient))
     return NULL;
-  window = processterminalwindow(pid);
-  terminal = window ? wintoclient(window) : NULL;
-  if (!terminal || terminal == c || !isterminal(terminal) ||
-      terminal->swallowed || terminal->swallower)
-    return NULL;
-  return terminal;
+  /* Browsers and launchers may clear their environment. Their parent shell
+   * still identifies the exact terminal, including shared urxvtd windows. */
+  for (unsigned int depth = 0; pid > 1 && depth < 64; depth++) {
+    pid_t parent;
+
+    window = processterminalwindow(pid);
+    if (window) {
+      terminal = wintoclient(window);
+      if (!terminal || terminal == c || !isterminal(terminal) ||
+          terminal->swallowed || terminal->swallower)
+        return NULL;
+      return terminal;
+    }
+    parent = processparentpid(pid);
+    if (parent == pid)
+      break;
+    pid = parent;
+  }
+  return NULL;
 }
 
 void checkswallowed(Client *c) {

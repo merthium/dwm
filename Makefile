@@ -46,6 +46,7 @@ test-x11: tests/grab-release tests/tray-stacking tests/swallow
 	./tests/grab-release
 	./tests/tray-stacking
 	./tests/swallow
+	./tests/swallow --sanitized-test
 
 tests/swallow: tests/swallow.c dwm.c drw.c util.c config.h config.mk drw.h util.h push.c
 	${CC} ${CFLAGS} -Wno-unused-function -o $@ tests/swallow.c drw.c util.c ${LDFLAGS}
