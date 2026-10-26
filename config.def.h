@@ -51,6 +51,9 @@ static const float mfact = 0.55;
 static const int nmaster = 1;
 static const int resizehints = 0;
 static const int lockfullscreen = 1;
+static const int swallowautomatic = 1;
+/* Lowercase WM_CLASS names. Automatic swallowing needs inherited WINDOWID. */
+static const char *terminalapps[] = {"urxvt", "xterm", "st", "alacritty", "kitty"};
 static const Layout layouts[] = {
     {"t", tile},
     {"f", NULL},

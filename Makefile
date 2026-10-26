@@ -42,11 +42,16 @@ tests/tray-stacking: tests/tray-stacking.c dwm.c drw.c util.c config.h config.mk
 	${CC} ${CFLAGS} -Wno-unused-function -o $@ tests/tray-stacking.c drw.c util.c ${LDFLAGS}
 
 # Use a separate X server and explicitly set DWM_ISOLATED_X_TEST=1.
-test-x11: tests/grab-release tests/tray-stacking
+test-x11: tests/grab-release tests/tray-stacking tests/swallow
 	./tests/grab-release
 	./tests/tray-stacking
+	./tests/swallow
+
+tests/swallow: tests/swallow.c dwm.c drw.c util.c config.h config.mk drw.h util.h push.c
+	${CC} ${CFLAGS} -Wno-unused-function -o $@ tests/swallow.c drw.c util.c ${LDFLAGS}
 
 clean:
+	rm -f tests/swallow
 	rm -f tests/tray-stacking
 	rm -f tests/tray-order
 	rm -f tests/bar-labels

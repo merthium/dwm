@@ -501,7 +501,8 @@ pid_t wintopid(Window window) {
 
   if (!xresclientids)
     return -1;
-  if (!XResQueryClientIds(dpy, 1, &spec, &count, &ids))
+  /* Unlike XResQueryVersion, this call returns Success (zero). */
+  if (XResQueryClientIds(dpy, 1, &spec, &count, &ids) != Success)
     return -1;
   for (long i = 0; i < count; i++) {
     pid = XResGetClientPid(&ids[i]);
@@ -527,9 +528,63 @@ void copyclientpos(Client *dst, Client *src) {
   dst->isfullscreen = src->isfullscreen;
 }
 
+/* WINDOWID identifies the originating window even when several terminals
+ * share a single server PID (urxvtc/urxvtd). Never guess from that PID. */
+Window processterminalwindow(pid_t pid) {
+  Window window = None;
+#ifdef __linux__
+  char path[64], *entry = NULL, *end;
+  size_t capacity = 0;
+  FILE *file;
+  unsigned long value;
+
+  if (pid <= 0)
+    return None;
+  snprintf(path, sizeof path, "/proc/%ld/environ", (long)pid);
+  if (!(file = fopen(path, "r")))
+    return None;
+  while (getdelim(&entry, &capacity, '\0', file) > 0) {
+    if (strncmp(entry, "WINDOWID=", 9) != 0)
+      continue;
+    errno = 0;
+    value = strtoul(entry + 9, &end, 0);
+    if (!errno && end != entry + 9 && !*end && value &&
+        value <= 0xffffffffUL && entry[9] != '-')
+      window = value;
+    break;
+  }
+  free(entry);
+  fclose(file);
+#endif
+  return window;
+}
+
+int isterminal(Client *c) {
+  for (size_t i = 0; i < LENGTH(terminalapps); i++)
+    if (strcmp(c->appname, terminalapps[i]) == 0)
+      return 1;
+  return 0;
+}
+
+Client *autoterminal(Client *c, pid_t pid) {
+  Client *terminal;
+  Window transient = None, window;
+
+  if (!swallowautomatic || isterminal(c) ||
+      XGetTransientForHint(dpy, c->win, &transient))
+    return NULL;
+  window = processterminalwindow(pid);
+  terminal = window ? wintoclient(window) : NULL;
+  if (!terminal || terminal == c || !isterminal(terminal) ||
+      terminal->swallowed || terminal->swallower)
+    return NULL;
+  return terminal;
+}
+
 void checkswallowed(Client *c) {
   SwallowDef **link;
   pid_t pid = wintopid(c->win);
+  Client *terminal = NULL;
 
   if (pid < 0)
     return;
@@ -537,23 +592,24 @@ void checkswallowed(Client *c) {
     SwallowDef *sd = *link;
 
     if (pid == sd->pid) {
-      c->swallower = sd->swallower;
+      terminal = sd->swallower;
       *link = sd->next;
       free(sd);
-      copyclientpos(c, c->swallower);
-
-      c->next_swallowed = c->swallower->swallowed;
-      c->swallower->swallowed = c;
-
-      c->next = c->swallower->next;
-      c->swallower->next = c;
-
-      c->snext = c->swallower->snext;
-      c->swallower->snext = c;
-
-      return;
+      break;
     }
   }
+  if (!terminal)
+    terminal = autoterminal(c, pid);
+  if (!terminal)
+    return;
+  c->swallower = terminal;
+  copyclientpos(c, terminal);
+  c->next_swallowed = terminal->swallowed;
+  terminal->swallowed = c;
+  c->next = terminal->next;
+  terminal->next = c;
+  c->snext = terminal->snext;
+  terminal->snext = c;
 }
 
 void attach(Client *c) {

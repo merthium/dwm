@@ -10,6 +10,7 @@ My daily window manager on Void Linux. Based on dwm 6.3 and the terror-dwm fork,
 - Status2d drawing and status text on every monitor; clickable battery and clock areas.
 - Stable tray ordering, including native XEmbed and bridged StatusNotifier icons.
 - Bar labels use application names instead of document or terminal titles.
+- Automatic terminal swallowing on Linux, including terminals sharing urxvtd.
 - Tests cover bar-label privacy and 720 tray docking permutations. Separate X11 tests exercise pointer grabs and tray stacking.
 
 ## Build and use
@@ -30,6 +31,25 @@ Read `config.h` before compiling. `config.def.h` contains the same defaults. Add
 Optional commands: urxvt, dmenu, mc, htop, zathura, xdg-open, pavucontrol, pactl, brightnessctl, flameshot, networkmanager_dmenu, upower and cal. Adjust the launchers and battery device for your machine. Personal helper commands have been replaced with standard programs. Fonts: Fragment Mono and Lilex Nerd Font Mono; change `fonts` if needed.
 
 The X11 tests must run on a separate X server with `DWM_ISOLATED_X_TEST=1`; they are not part of `make test`.
+
+## Terminal swallowing
+
+On Linux, a GUI application launched from a terminal automatically takes its
+tile. Closing the application restores the terminal. For example, run
+`feh image.png` or `nsxiv image.png` in urxvt. No wrapper or shell hook is needed.
+
+`swallowautomatic` enables this behavior. `terminalapps` lists lowercase
+WM_CLASS names. The application must inherit `WINDOWID`, and its local PID
+must be available through XRes so dwm can read `/proc/PID/environ`. Using the
+window ID rather than the terminal's PID keeps urxvtc windows distinct even
+when they share one urxvtd process. New terminal windows and transient dialogs
+are excluded; an already swallowing terminal does not swallow another window.
+Programs that reuse an existing process or discard `WINDOWID` may open
+separately. The existing `_BETTER_SWALLOW` registration interface remains
+available for explicit swallowing.
+
+`tests/swallow` checks real XRes PID lookup, two terminals sharing a process,
+replacement tile geometry, and terminal restoration on an isolated X server.
 
 ## Credits
 
